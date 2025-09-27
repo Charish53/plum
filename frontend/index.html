@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Amount Detection</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #4facfe;
+            background: #f8f9ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #4facfe;
+            background: #f0f8ff;
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s ease;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #4facfe;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .result h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        
+        .amount-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .amount-type {
+            font-weight: 600;
+            color: #4facfe;
+            text-transform: capitalize;
+        }
+        
+        .amount-value {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .amount-source {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .error {
+            background: #ffe6e6;
+            border-left-color: #ff4757;
+            color: #c44569;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .test-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .test-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            background: #e8f5e8;
+            color: #2d5a2d;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .ocr-text {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .text-boxes-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .text-box-item {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .text-content {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .text-info {
+            font-size: 12px;
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .json-data {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+        }
+        
+        .json-data pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="container">
+            <div class="header">
+                <h1>🏥 Medical Amount Detection</h1>
+                <p>AI-Powered OCR for Medical Bills & Receipts</p>
+            </div>
+            <div class="content">
+                <div class="status">
+                    ✅ System Loading... Please wait for React to initialize.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        console.log('Starting Medical Amount Detector...');
+        
+        const { useState, useRef } = React;
+
+        function MedicalAmountDetector() {
+            console.log('MedicalAmountDetector component rendering...');
+            
+            const [file, setFile] = useState(null);
+            const [preview, setPreview] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [result, setResult] = useState(null);
+            const [error, setError] = useState(null);
+            const [testText, setTestText] = useState('Total: INR 1200 | Paid: 1000 | Due: 200 | Discount: 10%');
+            const fileInputRef = useRef(null);
+
+            const handleFileSelect = (selectedFile) => {
+                console.log('File selected:', selectedFile);
+                if (selectedFile && selectedFile.type.startsWith('image/')) {
+                    setFile(selectedFile);
+                    setError(null);
+                    setResult(null);
+                    
+                    // Create preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => setPreview(e.target.result);
+                    reader.readAsDataURL(selectedFile);
+                } else {
+                    setError('Please select a valid image file.');
+                }
+            };
+
+            const handleDrop = (e) => {
+                e.preventDefault();
+                const droppedFile = e.dataTransfer.files[0];
+                handleFileSelect(droppedFile);
+            };
+
+            const handleDragOver = (e) => {
+                e.preventDefault();
+            };
+
+            const processImage = async () => {
+                if (!file) return;
+
+                setLoading(true);
+                setError(null);
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                try {
+                    console.log('Sending image to server...');
+                    const response = await fetch('http://localhost:3002/api/extract-medical-bill', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const data = await response.json();
+                    console.log('Response received:', data);
+                    
+                    if (response.ok) {
+                        setResult(data);
+                    } else {
+                        setError(data.message || 'An error occurred');
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    setError('Failed to connect to server. Make sure the backend is running on port 3002.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const processText = async () => {
+                if (!testText || testText.trim().length === 0) {
+                    setError('Please enter some text to process.');
+                    return;
+                }
+
+                setLoading(true);
+                setError(null);
+
+                try {
+                    console.log('Sending text to server...');
+                    const response = await fetch('http://localhost:3002/api/extract-medical-bill-text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: testText }),
+                    });
+
+                    const data = await response.json();
+                    console.log('Response received:', data);
+                    
+                    if (response.ok) {
+                        setResult(data);
+                    } else {
+                        setError(data.message || 'An error occurred');
+                    }
+                } catch (err) {
+                    console.error('Error:', err);
+                    setError('Failed to connect to server. Make sure the backend is running on port 3002.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const formatAmount = (amount) => {
+                // Map currency codes to valid ISO codes
+                const currencyMap = {
+                    'RS': 'INR',
+                    'Rs': 'INR', 
+                    '₹': 'INR',
+                    'USD': 'USD',
+                    '$': 'USD',
+                    'EUR': 'EUR',
+                    '€': 'EUR',
+                    'GBP': 'GBP',
+                    '£': 'GBP'
+                };
+                
+                const validCurrency = currencyMap[result?.currency] || 'INR';
+                
+                try {
+                    return new Intl.NumberFormat('en-IN', {
+                        style: 'currency',
+                        currency: validCurrency,
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                    }).format(amount);
+                } catch (error) {
+                    // Fallback to simple number formatting
+                    return `${validCurrency} ${amount.toLocaleString()}`;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>🏥 Medical Bill Extraction</h1>
+                        <p>AI-Powered OCR + Gemini AI for Medical Bills</p>
+                    </div>
+                    
+                    <div className="content">
+                        {/* Image Upload Section */}
+                        <div 
+                            className="upload-area"
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <div className="upload-icon">📁</div>
+                            <div className="upload-text">
+                                {file ? file.name : 'Click to upload or drag & drop an image'}
+                            </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="file-input"
+                                onChange={(e) => handleFileSelect(e.target.files[0])}
+                            />
+                        </div>
+
+                        {preview && (
+                            <img src={preview} alt="Preview" className="preview-image" />
+                        )}
+
+                        <button 
+                            className="btn" 
+                            onClick={processImage}
+                            disabled={!file || loading}
+                        >
+                            {loading ? (
+                                <div className="loading">
+                                    <div className="spinner"></div>
+                                    Processing...
+                                </div>
+                            ) : (
+                                '🔍 Process Image'
+                            )}
+                        </button>
+
+                        {/* Test Section */}
+                        <div className="test-section">
+                            <h3>🧪 Test with Sample Text</h3>
+                            <textarea
+                                className="test-textarea"
+                                value={testText}
+                                onChange={(e) => setTestText(e.target.value)}
+                                placeholder="Enter sample text like: Total: INR 1200 | Paid: 1000 | Due: 200"
+                            />
+                            <button 
+                                className="btn" 
+                                onClick={processText}
+                                disabled={loading || !testText.trim()}
+                            >
+                                {loading ? (
+                                    <div className="loading">
+                                        <div className="spinner"></div>
+                                        Processing...
+                                    </div>
+                                ) : (
+                                    '🔍 Process Text'
+                                )}
+                            </button>
+                        </div>
+
+                        {/* Results */}
+                        {error && (
+                            <div className="result error">
+                                <h3>❌ Error</h3>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {result && (
+                            <div className="result">
+                                <h3>🏥 Medical Bill Results</h3>
+                                {result.status === 'success' ? (
+                                    <div>
+                                        {result.htmlTable && (
+                                            <div dangerouslySetInnerHTML={{ __html: result.htmlTable }} />
+                                        )}
+                                        {result.data && (
+                                            <div className="json-data">
+                                                <h4>📊 Raw Data (JSON)</h4>
+                                                <pre>{JSON.stringify(result.data, null, 2)}</pre>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p><strong>Status:</strong> {result.status}</p>
+                                        {result.error && <p><strong>Error:</strong> {result.error}</p>}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        console.log('About to render React component...');
+        ReactDOM.render(<MedicalAmountDetector />, document.getElementById('root'));
+        console.log('React component rendered!');
+    </script>
+</body>
+</html>

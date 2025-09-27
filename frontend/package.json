@@ -1,0 +1,16 @@
+{
+  "name": "medical-bill-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Medical Bill OCR and Text Processing",
+  "main": "public/index.html",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "serve": "python -m http.server 3000",
+    "dev": "python -m http.server 3000"
+  },
+  "keywords": ["medical", "ocr", "react", "frontend"],
+  "author": "Medical Bill Processing System",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
