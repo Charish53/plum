@@ -41,9 +41,11 @@ This project provides an AI-powered solution for extracting and analyzing amount
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3002
 
-## API Documentation
+## Documentation
 
-See `postman-collection.json` for complete API testing collection with sample requests and responses.
+- **[4-Stage Pipeline Documentation](AI-Powered%20Amount%20Detection%20in%20Medical%20Documents.md)** - Detailed explanation of the AI-powered amount extraction pipeline
+- **[Architecture Diagram](architecture-diagram.md)** - Comprehensive system architecture and component diagrams
+- **[API Documentation](postman-collection.json)** - Complete API testing collection with sample requests and responses
 
 ## Technologies
 
