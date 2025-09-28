@@ -1,28 +1,190 @@
 # Problem Statement 8: AI-Powered Amount Detection in Medical Documents
 
+## Demo Link
+
+[Click here to view the demo video](https://drive.google.com/file/d/1p54qc8BZRJKKfnxrTssmX1CkQ9vY5nTw/view?usp=sharing)
+
 A sophisticated 4-step pipeline for extracting, normalizing, and classifying monetary amounts from medical bills and financial documents using LLM (Large Language Model) integration with regex fallback mechanisms.
 
 ## 🚀 Overview
 
-The Amount Extraction Service is a comprehensive solution that processes text from medical bills and financial documents to extract, normalize, and classify monetary amounts. It uses Google's Gemini AI for intelligent processing with robust fallback mechanisms to ensure reliability.
+The AI-Powered Amount Detection system is a comprehensive solution that combines OCR (Optical Character Recognition) and AI processing to extract, normalize, and classify monetary amounts from medical bills and financial documents. The system uses Google's Gemini AI for intelligent processing with robust fallback mechanisms to ensure reliability.
+
+### Key Features
+
+- **OCR Text Extraction**: Extract text from medical bill images using PaddleOCR
+- **AI-Powered Processing**: Use Google Gemini 2.0 Flash for intelligent text analysis
+- **4-Step Amount Pipeline**: Systematic extraction, normalization, and classification of monetary amounts
+- **Multiple Input Methods**: Support for image uploads and direct text input
+- **Fallback Mechanisms**: Regex-based processing when AI services are unavailable
+- **Comprehensive API**: RESTful endpoints for all processing stages
 
 ## 🏗️ Architecture
 
-### 4-Step Pipeline
+### System Overview
 
-1. **Step 1: Raw Token Extraction** - Extract numeric tokens and currency hints
-2. **Step 2: Amount Normalization** - Correct OCR errors and normalize values
-3. **Step 3: Context Classification** - Classify amounts by their context (total, paid, due, etc.)
-4. **Step 4: Final Output Generation** - Generate structured output with source tracking
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           AI-Powered Amount Detection System                    │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend API   │    │   OCR Service   │    │   AI Service    │
+│   (React)       │    │   (Express.js)  │    │   (PaddleOCR)   │    │   (Gemini AI)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │                       │
+         │                       │                       │                       │
+         ▼                       ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│ • Image Upload  │    │ • REST API      │    │ • Text          │    │ • LLM           │
+│ • Text Input    │    │ • Controllers   │    │   Extraction    │    │   Processing    │
+│ • Results       │    │ • Services      │    │ • Bounding      │    │ • Fallback      │
+│   Display       │    │ • Middleware    │    │   Boxes         │    │   Mechanisms    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### 4-Step Amount Extraction Pipeline
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           4-Step Amount Extraction Pipeline                     │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+    Input Text
+         │
+         ▼
+┌─────────────────┐
+│   Step 1:       │
+│   Raw Token     │
+│   Extraction    │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Step 2:       │
+│   Amount        │
+│   Normalization │
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Step 3:       │
+│   Context       │
+│   Classification│
+└─────────────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Step 4:       │
+│   Final Output  │
+│   Generation    │
+└─────────────────┘
+         │
+         ▼
+    Structured
+    Amount Data
+```
+
+### Data Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              Data Flow Architecture                             │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+Medical Bill Image
+         │
+         ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   OCR Service   │───▶│   Text          │───▶│   AI Service    │
+│   (PaddleOCR)   │    │   Extraction    │    │   (Gemini)      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Bounding      │    │   Raw Text      │    │   Structured    │
+│   Boxes         │    │   Content       │    │   Data          │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Amount        │    │   Amount        │    │   Amount        │
+│   Extraction    │    │   Extraction    │    │   Extraction    │
+│   Pipeline      │    │   Pipeline      │    │   Pipeline      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Final         │    │   Final         │    │   Final         │
+│   Results       │    │   Results       │    │   Results       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
 ### Core Components
 
+- **OCR Services**: PaddleOCR integration for text extraction from images
+- **MedicalBillProcessor**: Service for structured medical bill data extraction
 - **AmountExtractionService**: Main service class implementing the 4-step pipeline
 - **AmountExtractionController**: Express.js controller handling API endpoints
 - **AI Integration**: Google Gemini 2.0 Flash model for intelligent processing
 - **Fallback Mechanisms**: Regex-based processing when LLM is unavailable
 
+### Technology Stack
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                                Technology Stack                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+Frontend:
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React 18      │    │   HTML5/CSS3    │    │   JavaScript    │
+│   (CDN)         │    │   (Modern)      │    │   (ES6+)        │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+
+Backend:
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Node.js       │    │   Express.js    │    │   TypeScript    │
+│   (Runtime)     │    │   (Framework)   │    │   (Language)    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+
+OCR & AI:
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   PaddleOCR     │    │   Google        │    │   ONNX Runtime  │
+│   (Engine)      │    │   Gemini AI     │    │   (Inference)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
 ## 📋 API Endpoints
+
+### OCR Text Extraction
+
+#### OCR with Bounding Boxes
+```http
+POST /api/ocr-with-boxes
+Content-Type: multipart/form-data
+
+FormData: image (file)
+```
+
+**Response:**
+```json
+{
+  "fullText": "Complete extracted text...",
+  "textBoxes": [
+    {
+      "text": "Sample text",
+      "confidence": 0.95,
+      "bbox": [x1, y1, x2, y2]
+    }
+  ],
+  "totalBoxes": 25,
+  "averageConfidence": 0.89,
+  "status": "success"
+}
+```
+
+### Amount Extraction Endpoints
 
 ### Individual Step Endpoints
 
@@ -201,10 +363,17 @@ Content-Type: application/json
 
 - Node.js 18+ or Bun
 - Google Gemini API key (optional, for LLM features)
+- Git (for cloning the repository)
 
-### Backend Setup
+### Quick Start
 
-1. **Install Dependencies**
+1. **Clone the Repository**
+```bash
+git clone <repository-url>
+cd plum
+```
+
+2. **Backend Setup**
 ```bash
 cd backend
 npm install
@@ -212,31 +381,88 @@ npm install
 bun install
 ```
 
-2. **Environment Configuration**
+3. **Environment Configuration**
 Create a `.env` file in the backend directory:
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 PORT=3002
 ```
 
-3. **Start the Server**
+4. **Start the Backend Server**
 ```bash
 npm start
 # or
 bun start
 ```
 
-The server will start on `http://localhost:3002`
+The backend server will start on `http://localhost:3002`
+
+5. **Frontend Setup (Optional)**
+```bash
+cd frontend
+# No npm install needed - uses CDN React
+python -m http.server 3000
+# or
+npx serve public -p 3000
+```
+
+The frontend will be available at `http://localhost:3000`
 
 ### Health Check
 
-```http
-GET /health
+```bash
+curl http://localhost:3002/health
 ```
 
-## 🎯 Usage Examples
+### Development Setup
 
-### Basic Text Processing
+```bash
+# Backend development
+cd backend
+npm run dev
+
+# Frontend development
+cd frontend
+npm start
+```
+
+## 🎯 API Usage Examples
+
+### Complete Image-to-Amount Pipeline
+
+```javascript
+// Step 1: Extract text from medical bill image
+const formData = new FormData();
+formData.append('image', fileInput.files[0]);
+
+const ocrResponse = await fetch('http://localhost:3002/api/ocr-with-boxes', {
+  method: 'POST',
+  body: formData,
+});
+
+const ocrData = await ocrResponse.json();
+console.log('OCR Result:', ocrData);
+
+// Step 2: Run amount extraction on extracted text
+const amountResponse = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ text: ocrData.fullText }),
+});
+
+const amountData = await amountResponse.json();
+console.log('Amount Extraction Result:', amountData);
+
+// Combine results
+const finalResult = {
+  ocr: ocrData,
+  amounts: amountData
+};
+```
+
+### Direct Text Processing
 
 ```javascript
 const response = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
@@ -268,27 +494,147 @@ const result = await response.json();
 console.log(result);
 ```
 
-### Integration with Medical Bill Processing
+### Individual Step Processing
 
 ```javascript
-// First extract text from image
-const billResponse = await fetch('http://localhost:3002/api/extract-medical-bill', {
-  method: 'POST',
-  body: formData, // Contains image file
-});
-
-const billData = await billResponse.json();
-
-// Then run amount extraction on extracted text
-const amountResponse = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
+// Step 1: Raw Token Extraction
+const step1Response = await fetch('http://localhost:3002/api/amount-extraction/step1', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({ text: billData.extractedText }),
+  body: JSON.stringify({ text: "Total: 1500.00, Paid: 1000.00" }),
 });
 
-const amountData = await amountResponse.json();
+const step1Result = await step1Response.json();
+console.log('Step 1 - Raw Tokens:', step1Result);
+
+// Step 2: Amount Normalization
+const step2Response = await fetch('http://localhost:3002/api/amount-extraction/step2', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ text: "Total: 1500.00, Paid: 1000.00" }),
+});
+
+const step2Result = await step2Response.json();
+console.log('Step 2 - Normalized:', step2Result);
+
+// Step 3: Context Classification
+const step3Response = await fetch('http://localhost:3002/api/amount-extraction/step3', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ text: "Total: 1500.00, Paid: 1000.00" }),
+});
+
+const step3Result = await step3Response.json();
+console.log('Step 3 - Classified:', step3Result);
+
+// Step 4: Final Output
+const step4Response = await fetch('http://localhost:3002/api/amount-extraction/step4', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ text: "Total: 1500.00, Paid: 1000.00" }),
+});
+
+const step4Result = await step4Response.json();
+console.log('Step 4 - Final Output:', step4Result);
+```
+
+### Frontend Integration Example
+
+```javascript
+// React component example
+import React, { useState } from 'react';
+
+function MedicalBillProcessor() {
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const processImage = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Step 1: OCR processing
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const ocrResponse = await fetch('http://localhost:3002/api/ocr-with-boxes', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const ocrData = await ocrResponse.json();
+
+      if (!ocrResponse.ok) {
+        throw new Error(ocrData.message || 'OCR processing failed');
+      }
+
+      // Step 2: Amount extraction
+      const amountResponse = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: ocrData.fullText }),
+      });
+
+      const amountData = await amountResponse.json();
+
+      if (!amountResponse.ok) {
+        throw new Error(amountData.message || 'Amount extraction failed');
+      }
+
+      // Combine results
+      setResult({
+        ocr: ocrData,
+        amounts: amountData
+      });
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleFileSelect} accept="image/*" />
+      <button onClick={processImage} disabled={!file || loading}>
+        {loading ? 'Processing...' : 'Process Image'}
+      </button>
+      
+      {error && <div style={{color: 'red'}}>Error: {error}</div>}
+      
+      {result && (
+        <div>
+          <h3>OCR Results:</h3>
+          <pre>{JSON.stringify(result.ocr, null, 2)}</pre>
+          
+          <h3>Amount Extraction Results:</h3>
+          <pre>{JSON.stringify(result.amounts, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default MedicalBillProcessor;
 ```
 
 ## 🏷️ Amount Classification Types
@@ -321,11 +667,41 @@ When the Gemini API is unavailable or not configured, the service automatically 
 - **Processing Errors**: Returns error status with detailed messages
 - **Service Unavailable**: Returns 503 status when services aren't initialized
 
-## 🧪 Testing
+## 🧪 Testing & Validation
 
-### Test with Sample Text
+### Postman Collection
+
+For easy API testing, download the complete Postman collection:
+
+**[📥 Download Postman Collection](https://drive.google.com/file/d/YOUR_GDRIVE_FILE_ID/view?usp=sharing)**
+
+The collection includes:
+- **Health Check**: Server status verification
+- **OCR Endpoints**: Text extraction with bounding boxes
+- **Amount Extraction**: Complete pipeline and individual steps
+- **Sample Requests**: Pre-configured test cases with medical bill text
+- **Response Examples**: Expected JSON responses for each endpoint
+- **Test Scripts**: Automated validation and response time checks
+
+### Health Check
 
 ```bash
+# Check if the server is running
+curl http://localhost:3002/health
+```
+
+### Test OCR Endpoint
+
+```bash
+# Test OCR with bounding boxes
+curl -X POST http://localhost:3002/api/ocr-with-boxes \
+  -F "image=@/path/to/medical-bill.jpg"
+```
+
+### Test Amount Extraction Endpoints
+
+```bash
+# Test complete pipeline
 curl -X POST http://localhost:3002/api/amount-extraction/pipeline \
   -H "Content-Type: application/json" \
   -d '{
@@ -336,25 +712,51 @@ curl -X POST http://localhost:3002/api/amount-extraction/pipeline \
 ### Individual Step Testing
 
 ```bash
-# Test Step 1
+# Test Step 1: Raw Token Extraction
 curl -X POST http://localhost:3002/api/amount-extraction/step1 \
   -H "Content-Type: application/json" \
   -d '{"text": "Bill Total: 1200.00"}'
 
-# Test Step 2
+# Test Step 2: Amount Normalization
 curl -X POST http://localhost:3002/api/amount-extraction/step2 \
   -H "Content-Type: application/json" \
   -d '{"text": "Bill Total: 1200.00"}'
 
-# Test Step 3
+# Test Step 3: Context Classification
 curl -X POST http://localhost:3002/api/amount-extraction/step3 \
   -H "Content-Type: application/json" \
   -d '{"text": "Bill Total: 1200.00"}'
 
-# Test Step 4
+# Test Step 4: Final Output Generation
 curl -X POST http://localhost:3002/api/amount-extraction/step4 \
   -H "Content-Type: application/json" \
   -d '{"text": "Bill Total: 1200.00"}'
+```
+
+### Complete Pipeline Test
+
+```bash
+# Test the complete OCR + Amount Extraction pipeline
+# Step 1: OCR
+curl -X POST http://localhost:3002/api/ocr-with-boxes \
+  -F "image=@/path/to/medical-bill.jpg" \
+  -o ocr_result.json
+
+# Step 2: Extract text from OCR result
+TEXT=$(cat ocr_result.json | jq -r '.fullText')
+
+# Step 3: Amount extraction
+curl -X POST http://localhost:3002/api/amount-extraction/pipeline \
+  -H "Content-Type: application/json" \
+  -d "{\"text\": \"$TEXT\"}" \
+  -o amount_result.json
+
+# View results
+echo "OCR Result:"
+cat ocr_result.json | jq '.'
+
+echo "Amount Extraction Result:"
+cat amount_result.json | jq '.'
 ```
 
 ## 🔧 Configuration
@@ -456,6 +858,34 @@ The current frontend implementation provides basic integration with the amount e
 - **Error Recovery**: User-friendly error messages and recovery options
 - **Performance Metrics**: Display processing times and accuracy metrics
 
+### Additional OCR Endpoints (Future Enhancements)
+
+#### Simple OCR (Text Only)
+```http
+POST /api/ocr
+Content-Type: multipart/form-data
+
+FormData: image (file)
+```
+
+#### Medical Bill Extraction (Complete Pipeline)
+```http
+POST /api/extract-medical-bill
+Content-Type: multipart/form-data
+
+FormData: image (file)
+```
+
+#### Direct Text Processing
+```http
+POST /api/extract-medical-bill-text
+Content-Type: application/json
+
+{
+  "text": "Medical bill text to process..."
+}
+```
+
 ### Backend Enhancements (Planned)
 
 #### Advanced AI Features
@@ -506,16 +936,28 @@ npm run dev
 ### Code Structure
 
 ```
-backend/src/
-├── services/
-│   ├── amount-extraction.service.ts    # Main service implementation
-│   └── ai.service.ts                   # AI service integration
-├── controllers/
-│   └── amount-extraction.controller.ts # API controller
-├── interfaces/
-│   ├── medical-bill.interfaces.ts      # Type definitions
-│   └── ocr.interfaces.ts               # OCR interfaces
-└── ...
+plum/
+├── backend/
+│   ├── src/
+│   │   ├── services/
+│   │   │   ├── amount-extraction.service.ts    # Main service implementation
+│   │   │   ├── ai.service.ts                   # AI service integration
+│   │   │   ├── ocr.service.ts                  # OCR service adapter
+│   │   │   └── medical-bill.service.ts         # Medical bill processor
+│   │   ├── controllers/
+│   │   │   └── amount-extraction.controller.ts # API controller
+│   │   ├── interfaces/
+│   │   │   ├── medical-bill.interfaces.ts      # Type definitions
+│   │   │   └── ocr.interfaces.ts               # OCR interfaces
+│   │   └── ...
+│   ├── ocr-server.ts                           # Main server file
+│   ├── package.json                            # Dependencies
+│   └── .env                                    # Environment variables
+├── frontend/
+│   ├── index.html                              # Main frontend file
+│   ├── public/                                 # Static assets
+│   └── README.md                               # Frontend documentation
+└── README.md                                   # This file
 ```
 
 ### Testing
@@ -531,22 +973,86 @@ npm run lint
 npm run lint:fix
 ```
 
+### Development Workflow
+
+1. **Create a feature branch**
+```bash
+git checkout -b feature/your-feature-name
+```
+
+2. **Make your changes**
+3. **Test your changes**
+```bash
+npm test
+npm run lint
+```
+
+4. **Commit your changes**
+```bash
+git add .
+git commit -m "Add your feature description"
+```
+
+5. **Push and create a pull request**
+```bash
+git push origin feature/your-feature-name
+```
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🆘 Support
+## 🆘 Support & Troubleshooting
 
-For support and questions:
+### Common Issues
+
+1. **Server Not Starting**
+   - Check if port 3002 is available
+   - Verify Node.js version (18+ required)
+   - Check environment variables
+
+2. **OCR Processing Fails**
+   - Ensure image file is valid (JPG, PNG, etc.)
+   - Check file size limits
+   - Verify PaddleOCR installation
+
+3. **AI Processing Errors**
+   - Verify Gemini API key is valid
+   - Check API quota limits
+   - System will fallback to regex processing
+
+4. **Frontend Connection Issues**
+   - Ensure backend is running on port 3002
+   - Check CORS settings
+   - Verify network connectivity
+
+### Debugging
+
+```bash
+# Check server status
+curl http://localhost:3002/health
+
+# View server logs
+cd backend
+npm run dev
+
+# Test individual components
+curl -X POST http://localhost:3002/api/amount-extraction/step1 \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Test: 100.00"}'
+```
+
+### Getting Help
 
 1. Check the console logs for detailed error messages
 2. Verify your Gemini API key is correctly configured
 3. Ensure the backend server is running on port 3002
 4. Test with the provided sample text to verify functionality
+5. Review the troubleshooting section above
 
 ## 🔗 Related Documentation
 
-- [Medical Bill Processing API](./README.md)
-- [OCR Service Documentation](./OCR_README.md)
+- [Architecture Diagrams](./architecture-diagram.md)
 - [Frontend Integration Guide](./frontend/README.md)
 - [API Reference](./API_REFERENCE.md)
+- [Medical Bill Processing API](./README.md)
