@@ -47,6 +47,83 @@ This project provides an AI-powered solution for extracting and analyzing amount
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3002
 
+## Sample Example
+
+### Input Image
+![Sample Medical Bill](assets/bill-copy.png)
+
+### Step 1: OCR Text Extraction
+**Endpoint:** `POST http://localhost:3002/api/ocr-with-boxes`
+
+**Response:**
+```json
+{
+  "fullText": "MEDICAL BILL\nPatient: John Doe\nDate: 2024-01-15\n\nRoom Rent: 4,000.00\nConsultation: 500.00\nMedicine: 1,200.00\n\nSubtotal: 5,700.00\nTax (18%): 1,026.00\nGrand Total: 6,726.00\n\nAmount Paid: 5,000.00\nOutstanding: 1,726.00",
+  "textBoxes": [
+    {
+      "text": "MEDICAL BILL",
+      "confidence": 0.98,
+      "bbox": [10, 20, 150, 40]
+    },
+    {
+      "text": "Patient: John Doe",
+      "confidence": 0.95,
+      "bbox": [10, 50, 200, 70]
+    },
+    {
+      "text": "6,726.00",
+      "confidence": 0.99,
+      "bbox": [300, 200, 400, 220]
+    }
+  ],
+  "totalBoxes": 25,
+  "averageConfidence": 0.89,
+  "status": "success"
+}
+```
+
+### Step 2: Amount Extraction Pipeline
+**Endpoint:** `POST http://localhost:3002/api/amount-extraction/pipeline`
+
+**Response:**
+```json
+{
+  "status": "success",
+  "pipeline": "complete",
+  "result": {
+    "currency": "INR",
+    "amounts": [
+      {
+        "type": "total_bill",
+        "value": 6726,
+        "source": "text: 'Grand Total: 6,726.00'"
+      },
+      {
+        "type": "paid",
+        "value": 5000,
+        "source": "text: 'Amount Paid: 5,000.00'"
+      },
+      {
+        "type": "due",
+        "value": 1726,
+        "source": "text: 'Outstanding: 1,726.00'"
+      },
+      {
+        "type": "tax",
+        "value": 1026,
+        "source": "text: 'Tax (18%): 1,026.00'"
+      },
+      {
+        "type": "subtotal",
+        "value": 5700,
+        "source": "text: 'Subtotal: 5,700.00'"
+      }
+    ],
+    "status": "ok"
+  }
+}
+```
+
 ## Documentation
 
 - **[4-Stage Pipeline Documentation](AI-Powered%20Amount%20Detection%20in%20Medical%20Documents.md)** - Detailed explanation of the AI-powered amount extraction pipeline
