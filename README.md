@@ -24,20 +24,26 @@ This project provides an AI-powered solution for extracting and analyzing amount
 
 ## Quick Start
 
-1. **Backend Setup:**
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/Charish53/plum.git
+   cd plum
+   ```
+
+2. **Backend Setup:**
    ```bash
    cd backend
    npm install
    npm run dev
    ```
 
-2. **Frontend Setup:**
+3. **Frontend Setup:**
    ```bash
    cd frontend
    npm start
    ```
 
-3. **Access the Application:**
+4. **Access the Application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3002
 
