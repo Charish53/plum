@@ -175,9 +175,6 @@ Powered by DocPulse Software -wwwdocpulse.com
 }
 ```
 
-## Demo
-
-[Click here to view the demo video](https://drive.google.com/file/d/1p54qc8BZRJKKfnxrTssmX1CkQ9vY5nTw/view?usp=sharing)
 
 ## License
 
