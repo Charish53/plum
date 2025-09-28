@@ -47,7 +47,6 @@ This project provides an AI-powered solution for extracting and analyzing amount
    
    Add the following environment variables to `.env`:
    ```env
-   # Google Gemini API Key (optional - system will use regex fallback if not provided)
    GEMINI_API_KEY=your_gemini_api_key_here
    
    # Server Configuration
