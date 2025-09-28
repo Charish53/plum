@@ -296,7 +296,7 @@
             const [loading, setLoading] = useState(false);
             const [result, setResult] = useState(null);
             const [error, setError] = useState(null);
-            const [testText, setTestText] = useState('Total: INR 1200 | Paid: 1000 | Due: 200 | Discount: 10%');
+            const [testText, setTestText] = useState('ANKURA PHARMACY\nSubtotal: 1,687.96\nCGST 6%: 101.28\nSGST 6%: 101.28\nGrand Total: 1,890.52\nAmount Received: 1,000.00\nBalance Due: 890.52');
             const fileInputRef = useRef(null);
 
             const handleFileSelect = (selectedFile) => {
@@ -335,19 +335,52 @@
                 formData.append('image', file);
 
                 try {
-                    console.log('Sending image to server...');
-                    const response = await fetch('http://localhost:3002/api/extract-medical-bill', {
+                    console.log('Sending image to server for complete pipeline...');
+                    
+                    // Step 1: Extract medical bill data
+                    const billResponse = await fetch('http://localhost:3002/api/extract-medical-bill', {
                         method: 'POST',
                         body: formData,
                     });
 
-                    const data = await response.json();
-                    console.log('Response received:', data);
+                    const billData = await billResponse.json();
+                    console.log('Medical bill response received:', billData);
                     
-                    if (response.ok) {
-                        setResult(data);
+                    if (!billResponse.ok) {
+                        setError(billData.message || 'Failed to extract medical bill data');
+                        return;
+                    }
+
+                    // Step 2: Run amount extraction pipeline on the extracted text
+                    const extractedText = billData.extractedText;
+                    if (!extractedText) {
+                        setError('No text extracted from image');
+                        return;
+                    }
+
+                    console.log('Running amount extraction pipeline on extracted text...');
+                    const amountResponse = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: extractedText }),
+                    });
+
+                    const amountData = await amountResponse.json();
+                    console.log('Amount extraction response received:', amountData);
+                    
+                    if (amountResponse.ok) {
+                        // Combine both results
+                        console.log('Combining results:', { billData, amountData, extractedText });
+                        setResult({
+                            ...billData,
+                            amountExtraction: amountData,
+                            extractedText: extractedText
+                        });
                     } else {
-                        setError(data.message || 'An error occurred');
+                        console.error('Amount extraction failed:', amountData);
+                        setError(amountData.message || 'Failed to extract amounts');
                     }
                 } catch (err) {
                     console.error('Error:', err);
@@ -367,8 +400,8 @@
                 setError(null);
 
                 try {
-                    console.log('Sending text to server...');
-                    const response = await fetch('http://localhost:3002/api/extract-medical-bill-text', {
+                    console.log('Running amount extraction pipeline on text...');
+                    const response = await fetch('http://localhost:3002/api/amount-extraction/pipeline', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -377,11 +410,16 @@
                     });
 
                     const data = await response.json();
-                    console.log('Response received:', data);
+                    console.log('Amount extraction response received:', data);
                     
                     if (response.ok) {
-                        setResult(data);
+                        console.log('Text processing successful:', data);
+                        setResult({
+                            amountExtraction: data,
+                            extractedText: testText
+                        });
                     } else {
+                        console.error('Text processing failed:', data);
                         setError(data.message || 'An error occurred');
                     }
                 } catch (err) {
@@ -392,7 +430,7 @@
                 }
             };
 
-            const formatAmount = (amount) => {
+            const formatAmount = (amount, currency = 'INR') => {
                 // Map currency codes to valid ISO codes
                 const currencyMap = {
                     'RS': 'INR',
@@ -403,10 +441,11 @@
                     'EUR': 'EUR',
                     '€': 'EUR',
                     'GBP': 'GBP',
-                    '£': 'GBP'
+                    '£': 'GBP',
+                    'Unknown': 'INR'
                 };
                 
-                const validCurrency = currencyMap[result?.currency] || 'INR';
+                const validCurrency = currencyMap[currency] || 'INR';
                 
                 try {
                     return new Intl.NumberFormat('en-IN', {
@@ -424,8 +463,8 @@
             return (
                 <div className="container">
                     <div className="header">
-                        <h1>🏥 Medical Bill Extraction</h1>
-                        <p>AI-Powered OCR + Gemini AI for Medical Bills</p>
+                        <h1>🏥 Complete Medical Bill Pipeline</h1>
+                        <p>OCR + Medical Bill Extraction + Amount Detection with Gemini AI</p>
                     </div>
                     
                     <div className="content">
@@ -464,7 +503,7 @@
                                     Processing...
                                 </div>
                             ) : (
-                                '🔍 Process Image'
+                                '🚀 Run Complete Pipeline'
                             )}
                         </button>
 
@@ -475,7 +514,7 @@
                                 className="test-textarea"
                                 value={testText}
                                 onChange={(e) => setTestText(e.target.value)}
-                                placeholder="Enter sample text like: Total: INR 1200 | Paid: 1000 | Due: 200"
+                                placeholder="Enter medical bill text like: ANKURA PHARMACY\nSubtotal: 1,687.96\nCGST 6%: 101.28\nGrand Total: 1,890.52\nAmount Received: 1,000.00\nBalance Due: 890.52"
                             />
                             <button 
                                 className="btn" 
@@ -487,9 +526,9 @@
                                         <div className="spinner"></div>
                                         Processing...
                                     </div>
-                                ) : (
-                                    '🔍 Process Text'
-                                )}
+                            ) : (
+                                '💰 Extract Amounts from Text'
+                            )}
                             </button>
                         </div>
 
@@ -503,25 +542,10 @@
 
                         {result && (
                             <div className="result">
-                                <h3>🏥 Medical Bill Results</h3>
-                                {result.status === 'success' ? (
-                                    <div>
-                                        {result.htmlTable && (
-                                            <div dangerouslySetInnerHTML={{ __html: result.htmlTable }} />
-                                        )}
-                                        {result.data && (
-                                            <div className="json-data">
-                                                <h4>📊 Raw Data (JSON)</h4>
-                                                <pre>{JSON.stringify(result.data, null, 2)}</pre>
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p><strong>Status:</strong> {result.status}</p>
-                                        {result.error && <p><strong>Error:</strong> {result.error}</p>}
-                                    </div>
-                                )}
+                                <h3>📊 Pipeline Response (JSON)</h3>
+                                <div className="json-data">
+                                    <pre>{JSON.stringify(result, null, 2)}</pre>
+                                </div>
                             </div>
                         )}
                     </div>

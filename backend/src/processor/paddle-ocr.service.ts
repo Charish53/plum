@@ -85,34 +85,8 @@ export class PaddleOcrService {
       throw new Error("Response body is null or undefined");
     }
 
-    const contentLength = response.headers.get("Content-Length");
-    const totalLength = contentLength ? parseInt(contentLength, 10) : 0;
-    let receivedLength = 0;
-    const chunks: Uint8Array[] = [];
-
-    const reader = response.body.getReader();
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      chunks.push(value);
-      receivedLength += value.length;
-
-      if (totalLength > 0) {
-        const percentage = ((receivedLength / totalLength) * 100).toFixed(2);
-        process.stdout.write(`\rDownloading... ${percentage}%`);
-      }
-    }
-    process.stdout.write("\n"); // Move to the next line
-
-    const buffer = new Uint8Array(receivedLength);
-    let position = 0;
-    for (const chunk of chunks) {
-      buffer.set(chunk, position);
-      position += chunk.length;
-    }
+    // Use arrayBuffer() method which works with both node-fetch and native fetch
+    const buffer = await response.arrayBuffer();
 
     this.log(`Caching resource to: ${cachePath}`);
     if (!existsSync(CACHE_DIR)) {
@@ -120,7 +94,7 @@ export class PaddleOcrService {
     }
     writeFileSync(cachePath, Buffer.from(buffer));
 
-    return buffer.buffer;
+    return buffer;
   }
 
   /**

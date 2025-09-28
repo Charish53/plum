@@ -10,6 +10,8 @@
     // Bundler mode
     "moduleResolution": "Bundler",
     "verbatimModuleSyntax": true,
+    // Type definitions
+    "typeRoots": ["./node_modules/@types"],
     // Best practices
     "strict": true,
     "skipLibCheck": true,
@@ -26,5 +28,13 @@
     "declarationDir": "lib",
     "stripInternal": true,
     "isolatedDeclarations": true
-  }
+  },
+  "include": [
+    "src/**/*",
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
