@@ -101,31 +101,26 @@ This project provides an AI-powered solution for extracting and analyzing amount
 ### Step 1: OCR Text Extraction
 **Endpoint:** `POST http://localhost:3002/api/ocr-with-boxes`
 
-**Response:**
-```json
-{
-  "fullText": "MEDICAL BILL\nPatient: John Doe\nDate: 2024-01-15\n\nRoom Rent: 4,000.00\nConsultation: 500.00\nMedicine: 1,200.00\n\nSubtotal: 5,700.00\nTax (18%): 1,026.00\nGrand Total: 6,726.00\n\nAmount Paid: 5,000.00\nOutstanding: 1,726.00",
-  "textBoxes": [
-    {
-      "text": "MEDICAL BILL",
-      "confidence": 0.98,
-      "bbox": [10, 20, 150, 40]
-    },
-    {
-      "text": "Patient: John Doe",
-      "confidence": 0.95,
-      "bbox": [10, 50, 200, 70]
-    },
-    {
-      "text": "6,726.00",
-      "confidence": 0.99,
-      "bbox": [300, 200, 400, 220]
-    }
-  ],
-  "totalBoxes": 25,
-  "averageConfidence": 0.89,
-  "status": "success"
-}
+**Input Text:**
+```
+Docpulse Clinic
+718HarsaPlazaAbove Med
+DocPulse Clinic JP Nagar 6sh Phase,BangaloreS60078
+08042108688
+manishkrverma5gmail.com
+www.docp.se.com
+NamerContact: Adarsh/09591027967 ID 100007 AgelSex: 1
+Date: 19/09/201609:16AM Bills 10001 De/Referrer: Harish Kumar
+BimReceipts
+SLNO Particulars Charges Quantity Amount
+1 Consultation-Or.Harish Kumar 200 1 200
+2 Compkete Blcod Count 220 1 220
+Four Hundred and Twenty Only Total Billed 420
+Payable 420
+19/0/201609:17AM-Receed Rs.420by Cash) as Payment
+Authorized Signatory
+Manish Kapoor
+Powered by DocPulse Software -wwwdocpulse.com
 ```
 
 ### Step 2: Amount Extraction Pipeline
@@ -141,28 +136,38 @@ This project provides an AI-powered solution for extracting and analyzing amount
     "amounts": [
       {
         "type": "total_bill",
-        "value": 6726,
-        "source": "text: 'Grand Total: 6,726.00'"
+        "value": 420,
+        "source": "text: '0 1 220\nFour Hundred and Twenty Only Total Billed 420\nPayable 420\n19/0/201609:17AM-Receed Rs.420by Cash'"
+      },
+      {
+        "type": "total_bill",
+        "value": 420,
+        "source": "text: '0 1 220\nFour Hundred and Twenty Only Total Billed 420\nPayable 420\n19/0/201609:17AM-Receed Rs.420by Cash'"
       },
       {
         "type": "paid",
-        "value": 5000,
-        "source": "text: 'Amount Paid: 5,000.00'"
+        "value": 420,
+        "source": "text: '0 1 220\nFour Hundred and Twenty Only Total Billed 420\nPayable 420\n19/0/201609:17AM-Receed Rs.420by Cash'"
       },
       {
-        "type": "due",
-        "value": 1726,
-        "source": "text: 'Outstanding: 1,726.00'"
+        "type": "other",
+        "value": 200,
+        "source": "text: 'es Quantity Amount\n1 Consultation-Or.Harish Kumar 200 1 200\n2 Compkete Blcod Count 220 1 220\nFour Hundr'"
       },
       {
-        "type": "tax",
-        "value": 1026,
-        "source": "text: 'Tax (18%): 1,026.00'"
+        "type": "other",
+        "value": 200,
+        "source": "text: 'es Quantity Amount\n1 Consultation-Or.Harish Kumar 200 1 200\n2 Compkete Blcod Count 220 1 220\nFour Hundr'"
       },
       {
-        "type": "subtotal",
-        "value": 5700,
-        "source": "text: 'Subtotal: 5,700.00'"
+        "type": "other",
+        "value": 220,
+        "source": "text: '-Or.Harish Kumar 200 1 200\n2 Compkete Blcod Count 220 1 220\nFour Hundred and Twenty Only Total Billed 4'"
+      },
+      {
+        "type": "other",
+        "value": 220,
+        "source": "text: '-Or.Harish Kumar 200 1 200\n2 Compkete Blcod Count 220 1 220\nFour Hundred and Twenty Only Total Billed 4'"
       }
     ],
     "status": "ok"
