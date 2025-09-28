@@ -1,6 +1,8 @@
 # AI-Powered Amount Detection in Medical Documents
 
-**Demo Video Link:** https://drive.google.com/file/d/1p54qc8BZRJKKfnxrTssmX1CkQ9vY5nTw/view?usp=sharing
+**Demo Video Link:** [Link](https://drive.google.com/file/d/1p54qc8BZRJKKfnxrTssmX1CkQ9vY5nTw/view?usp=sharing)
+
+**Google drive Link:** [Link](https://drive.google.com/drive/u/1/folders/12d90aM-Ps-6QFfSC_UupxHyFSlByxwrC)
 
 ## Overview
 
@@ -34,16 +36,47 @@ This project provides an AI-powered solution for extracting and analyzing amount
    ```bash
    cd backend
    npm install
+   ```
+
+3. **Environment Configuration:**
+   Create a `.env` file in the backend directory:
+   ```bash
+   # Create .env file
+   touch .env
+   ```
+   
+   Add the following environment variables to `.env`:
+   ```env
+   # Google Gemini API Key (optional - system will use regex fallback if not provided)
+   GEMINI_API_KEY=your_gemini_api_key_here
+   
+   # Server Configuration
+   PORT=3002
+   
+   # CORS Configuration
+   CORS_ORIGIN=http://localhost:3000
+   
+   # File Upload Configuration
+   MAX_FILE_SIZE=10MB
+   ALLOWED_FILE_TYPES=jpg,jpeg,png,pdf
+   
+   # Optional: Enable debug logging
+   DEBUG=true
+   ```
+   
+
+4. **Start the Backend Server:**
+   ```bash
    npm run dev
    ```
 
-3. **Frontend Setup:**
+5. **Frontend Setup:**
    ```bash
    cd frontend
    npm start
    ```
 
-4. **Access the Application:**
+6. **Access the Application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3002
 
